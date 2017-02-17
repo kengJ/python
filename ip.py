@@ -2,29 +2,19 @@
 import urllib,re,json
 
 def checkSelfIp():
-    url = "http://1212.ip138.com/ic.asp"
-    html = urllib.urlopen(url).read().decode('gbk')
-    # print html
-    ip = re.findall('([1-9]{1,}[\.]{1}[1-9]{1,}[\.]{1}[1-9]{1,}[\.]{1}[1-9]{1,})',html)
-    print u"你当前的公网ip:"+ip[0]
+    html = urllib.urlopen("http://1212.ip138.com/ic.asp").read().decode('gbk')
+    return u"你当前的公网ip:"+(re.findall('([1-9]{1,}[\.]{1}[1-9]{1,}[\.]{1}[1-9]{1,}[\.]{1}[1-9]{1,})',html))[0]+"\n"
 
 def GetHtmlIp(url):
-    checkSelfIp()
-    if url!=None:
-        host = "http://site.ip138.com/domain/read.do?domain="+url
-        html = json.loads(urllib.urlopen(host).read().decode('gbk'))
-        print"域名:"+url+"解析"
-        for d in html['data']:
-            ip = d['ip']
-            sign = d['sign']
-            address = urllib.urlopen("http://api.ip138.com/query/?ip="+ip+"&oid=50&mid=65575&datatype=jsonp&sign="+d['sign']).read()
-            address = json.loads(address)
-            str = ""
-            for a in address["data"]:
-                if a.strip():
-                    str += a + ","
-            print ip+"  "+str
-    else:
-        print u"url不能为空"
+    if not url.split():return u"url不能为空"
+    html = json.loads(urllib.urlopen("http://site.ip138.com/domain/read.do?domain="+url).read().decode('gbk'))
+    str = u"域名:" + url + u"解析\n"
+    for d in html['data']:
+        address = json.loads(urllib.urlopen("http://api.ip138.com/query/?ip="+d['ip']+"&oid=50&mid=65575&datatype=jsonp&sign="+d['sign']).read())
+        add = d['ip']+"  "
+        for a in address["data"]:
+            if a.strip():add += a + ","
+        str+=add+"\n"
+    return str
 
-GetHtmlIp("baidu.com")
+print checkSelfIp()+GetHtmlIp("baidu.com")
