@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import web
 from web.contrib.template import render_jinja
+
 urls=(
     '/','Index'
 )
