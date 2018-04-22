@@ -23,12 +23,12 @@ sheetBook = datas.sheet_by_name(sheetName)
 row,col,rows = 1,2,sheetBook.nrows
 print('总行数:'+str(rows))
 for rowvalues in range(1,rows):
-    No = getValue(sheetBook,row,1)#str(sheetBook.cell(row,1).value)
-    Code  = getValue(sheetBook,row,2)#str(sheetBook.cell(row,2).value)
-    Bed = getValue(sheetBook,row,3)#str(int(sheetBook.cell(row,3).value))
-    FType = getValue(sheetBook,row,4)#str(int(sheetBook.cell(row,4).value))
+    No = getValue(sheetBook,row,1)
+    Code  = getValue(sheetBook,row,2)
+    Bed = getValue(sheetBook,row,3)[0:1]
+    FType = str(getValue(sheetBook,row,4))[0:1]
     if rowvalues==rows-1:file.write("('"+Code+"','"+Bed+"','"+FType+"','"+No+"','0')\n")
-    else:file.write("('"+Code+"','"+Bed+"','"+FType+"','"+No+"','0'),\n")
+    else:file.write("('"+Code+"','"+Bed+"','"+FType+"','"+No+"','"+Bed+"'),\n")
     row+=1
-file.write()
+#file.write()
 file.close()
