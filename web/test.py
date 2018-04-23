@@ -6,11 +6,15 @@ import beforeAction as BAction
 import afterAction as AAction
 import win_unicode_console
 
-#show version
 app = Flask(__name__)
+
 homeIp = '192.168.1.107'
 workIp = '127.0.0.1'
-win_unicode_console.enable()#win10 bug
+
+systemMessage = tool.getSystemMessage()
+
+if 'Window' in systemMessage.get('System'):
+    win_unicode_console.enable()#win10 bug
 
 @app.route('/')
 def index():
@@ -39,8 +43,7 @@ def test():
 
 @app.route('/test1')
 def test1():
-    tool.getHostIpAndHostName()
-    return 'test1'
+    return systemMessage.get('System')
 
 if __name__ == '__main__':
     app.run(host=workIp,port=8080,debug=True) 
