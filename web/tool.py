@@ -1,5 +1,6 @@
 import socket
-import platform
+import platform#获取系统底层信息
+import configparser#处理配置文件
 #返回当前用户IP
 def getUserIp(request):
     return request.remote_addr
@@ -22,3 +23,20 @@ def getSystemMessage():
     LinuxVersion = '' if 'Linux' not in System else '%s %s' % (LinuxVersion[0],LinuxVersion[1])
     ComputerName = platform.node()#主机名
     return {'Framework':Framework,'System':System,'Details':Details,'CPU':CPU,'LinuxVersion':LinuxVersion,'ComputerName':ComputerName}
+
+#处理配置文件
+
+#整域读取配置
+def getConf(fileurl,sectionname):
+    conf = configparser.ConfigParser()
+    conf.read(fileurl)
+    return conf.items(sectionname)
+
+#整域写入配置
+def setConf(fileurl,sectionname,data):
+    conf = configparser.ConfigParser()
+    conf.add_section(sectionname)
+    for key in data.keys():
+        conf.set(key,data[key])
+    with open(fileurl, 'w') as fw:
+        conf.write(fw)
