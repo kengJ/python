@@ -1,6 +1,7 @@
 import socket
 import platform#获取系统底层信息
 import configparser#处理配置文件
+from flask import request
 #返回当前用户IP
 def getUserIp(request):
     return request.remote_addr
@@ -23,6 +24,21 @@ def getSystemMessage():
     LinuxVersion = '' if 'Linux' not in System else '%s %s' % (LinuxVersion[0],LinuxVersion[1])
     ComputerName = platform.node()#主机名
     return {'Framework':Framework,'System':System,'Details':Details,'CPU':CPU,'LinuxVersion':LinuxVersion,'ComputerName':ComputerName}
+
+#获取请求
+def getPath():
+    return request.path
+
+#处理请求
+def runAction(path):
+    if '/' in path[1:]:
+        className = path[1:path.find('/',1)]
+        funcName = path[path.find('/',1)+1:]
+        return className+'().'+funcName+'()'
+    elif len(path)==1:
+        return 'index()'
+    else:
+        return path[1:]+'()'
 
 #处理配置文件
 

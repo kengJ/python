@@ -2,6 +2,7 @@ from flask import Flask
 from flask import request
 import platform
 import tool
+import action
 import beforeAction as BAction
 import afterAction as AAction
 import win_unicode_console
@@ -17,10 +18,13 @@ if 'Window' in systemMessage.get('System'):
     win_unicode_console.enable()#win10 bug
 
 @app.route('/')
-def index():
+@app.route('/<c>')
+@app.route('/<c>/<a>')
+def index(c=None,a=None):
+    path = tool.getPath()
+    action.main(path)
     #user_agent = request.headers.get('User-Agent')
-    print(tool.getUserIp(request))
-    return 'hello word'
+    return path
 
 #首次请求会触发     
 # @app.before_first_request
@@ -37,13 +41,13 @@ def before_request():
 # def after_request():
 #     AAction.main(request.path,None)
 
-@app.route('/test/bbb')
-def test():
-    return 'test'
+# @app.route('/test/bbb')
+# def test():
+#     return 'test'
 
-@app.route('/test1')
-def test1():
-    return systemMessage.get('System')
+# @app.route('/test1')
+# def test1():
+#     return systemMessage.get('System')
 
 if __name__ == '__main__':
     app.run(host=workIp,port=8080,debug=True) 
