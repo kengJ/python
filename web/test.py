@@ -22,9 +22,9 @@ if 'Window' in systemMessage.get('System'):
 @app.route('/<c>/<a>')
 def index(c=None,a=None):
     path = tool.getPath()
-    action.main(path)
+
     #user_agent = request.headers.get('User-Agent')
-    return path
+    return action.main(path)
 
 #首次请求会触发     
 # @app.before_first_request

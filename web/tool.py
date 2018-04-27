@@ -56,3 +56,24 @@ def setConf(fileurl,sectionname,data):
         conf.set(key,data[key])
     with open(fileurl, 'w') as fw:
         conf.write(fw)
+
+class RequestTool:
+    request = None
+    def __init__(self,request):
+        self.request = request
+    #获取客户端Ip
+    def getClineIp(self):
+        return request.remote_addr
+    #获取请求信息
+    def getMessage(self,type):
+        result = None
+        type = type.lower() 
+        if type == 'method':
+            result = self.request.method
+        elif type == 'host':
+            request = self.request.host
+        elif type == 'path':
+            result = self.request.path
+        elif type == 'headers':
+            result = self.request.headers
+        return result
