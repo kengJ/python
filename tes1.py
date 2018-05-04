@@ -3,6 +3,7 @@ import time
 import pymssql
 
 rootdir = "D:\IccoServer_new\TextData" #主文件夹
+LogDir = 'LogData'
 
 #判断文件是否存在
 def checkExists(uri):
@@ -18,7 +19,7 @@ def getdatetime(text):
 	
 def upLog(message):
     try:
-        LogUri = '\LogData\%s.txt' % getdatetime('%Y%m') 
+        LogUri = '\%s\%s.txt' % (LogDir,getdatetime('%Y%m')) 
         LogFile = open(LoggetFileName(LogUri)File,'a')
         LogFile.write(message)
         LogFile.close()
@@ -27,15 +28,25 @@ def upLog(message):
     else:
         print('Log write success')
 
+#检查文件夹
+def checkFolder():	
+    if not checkExists("\%s" % LogDir):
+        print('Create Folder %s' % LogDir)
+        os.makedirs(getFileName('\%s' % LogDir))
+
+def uploadData(data):
+    for i in range(0,len(list)):
+		if os.path.isfile(getFileName(list[i])):
+            num = open(path,'r').readlines()
+            data.extend(num)
+            maxnum = maxnum+len(num)
+			#Log=Log+path+" 共"+str(len(num))+"条\n"
+			#shutil.move(path,rootdir+"\\LogData\\"+str(datetime))
+
 def main():
     list = os.listdir(rootdir)
 
-#检查文件夹
-def checkFolder():	
-    getFileName("\\LogData\\")
-    if not os.path.exists(rootdir+"\\LogData\\"+str(datetime)):
-        print("create dir:"+rootdir+"\\LogData\\"+str(datetime))
-        os.makedirs(rootdir+"\\LogData\\"+str(datetime))
+
 
 # def main():
 # 	list = os.listdir(rootdir)#
