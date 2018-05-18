@@ -1,11 +1,13 @@
 from flask import Flask
 from flask import request
+from flask import send_from_directory
 import platform
 import tool
 import action
 import beforeAction as BAction
 import afterAction as AAction
 import win_unicode_console
+import os
 
 app = Flask(__name__)
 
@@ -34,6 +36,11 @@ def index(c=None,a=None):
 @app.before_request
 def before_request():
     BAction.main(request.path,None)
+
+@app.route("/get_attachment/<path:filename>")
+def get_attachment(filename):
+    directory = os.path.join(os.getcwd(),'excel')
+    return send_from_directory(directory,filename,as_attachment=True)
 
 #@after_request 如果有异常抛出将不会被运行
 #@teardown_request 即使有异常抛出也会被执行
