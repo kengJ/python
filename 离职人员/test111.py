@@ -4,7 +4,7 @@ import xlwt
 import os
 
 def createExcel():
-    workbook = xlrd.open_workbook('C:\\Users\\heyanzhu\\Desktop\\互联网权限在用人员（工号）.xls')
+    workbook = xlrd.open_workbook(os.path.join(os.getcwd(),'互联网权限在用人员（工号）.xls'))
     booksheet = workbook.sheet_by_index(0)
     #print(booksheet.col_values(0))
     codes = ''
@@ -25,8 +25,7 @@ def createExcel():
     cur=conn.cursor()
     cur.execute(sql)
     result=cur.fetchall()
-    #print(result)
-    #workbook = xlrd.open_workbook('C:\\Users\\heyanzhu\\Desktop\\互联网权限在用人员（工号）.xls')
+
     workbook = xlwt.Workbook(encoding='utf-8')  
     booksheet = workbook.add_sheet('lzdata', cell_overwrite_ok=True)
     row = 0
@@ -44,8 +43,6 @@ files = list()
 index = 0
 for filename in os.listdir(os.getcwd()):
     if not filename in ('test111.py','start.bat'):
-        #print('%d.%s' % (index,filename))
-        #index = index + 1
         files.append(filename)
 if len(files)==0:
     print('找不到数据源文件')

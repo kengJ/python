@@ -1,21 +1,26 @@
 import os,xlwt,time,xlsxwriter,pymssql
+from flask import Flask
+from flask import request
+from flask import send_from_directory
 #用于写入数据
-
+app = Flask(__name__)
 def createXls(data,filename):
+    filename = checkFile(filename,'.xlsx')
     workbook = xlwt.Workbook(encoding='utf-8') 
     for key in data.keys():
         worksheet = workbook.add_sheet(key, cell_overwrite_ok=True) 
         worksheet = writeSheet(data[key],worksheet)
-    workbook.save(checkFile(filename,'.xlsx'))
-    return workbook
+    workbook.save(filename)
+    return filename
 
 def createXlsx(data,filename):
-    workbook = xlsxwriter.Workbook(checkFile(filename,'.xls'))
+    filename = checkFile(filename,'.xls')
+    workbook = xlsxwriter.Workbook(filename)
     for key in data.keys():
         worksheet = workbook.add_worksheet(key)
         worksheet = writeSheet(data[key],worksheet)
     workbook.close()
-    return workbook
+    return filename
 
 def checkFile(filename,fileType):
     #判断文件名是否存在
@@ -41,23 +46,12 @@ def main(data,filename):
             maxLine = len(sheet)
     #判断数据最大行数是否超过6000
     workbook = None
+    filename = None
     if maxLine < 6000:
-        workbook = createXls(data,filename)
+        filename = createXls(data,filename)
     else:
-        workbook = createXlsx(data,filename)
-
-def createComputer():
-    file = open('./computer.txt','w')
-    codes = ''
-    for code in range(0,8000):
-        if len(str(code))<4:
-            for index in range(0,4-len(str(code))):
-                code = '%s%s' % ('0',str(code))
-        else:
-            code = str(code)
-        codes = codes + '\np0'+str(code) 
-    file.write(codes)    
-    file.close()
+        filename = createXlsx(data,filename)
+    return filename
 
 def checkData(starttime,endtime):
     sql = '''select IC.Clock_id,IC.Clock_name,ZE.CODE,KC.CardNo,ZE.NAME,CONVERT(varchar(50),FS.brushdt,20) from fk_shuaka FS
@@ -72,10 +66,24 @@ AND IC.Clock_id in('6469','6470','6471','6472') AND KC.CardNo <>'' AND KC.CardNo
     result=cur.fetchall()
     return result
 
+@app.route("/getDate/<path:filename>")
+def get_attachment(filename):
+    directory = os.path.join(os.getcwd(),'excel')
+    return send_from_directory(directory,test(filename),as_attachment=True)
+
+@app.route('/')
+def index(starttime):
+    return None
+
 def test():
     starttime = input('请输入时间\n')
     #endtime = input('请输入结束时间\n')
     result = checkData(starttime,starttime)
     data = {starttime:result}
-    main(data,starttime+'.xls')
-test()
+    return main(data,starttime+'.xls')
+    
+#test()
+
+Ip = '192.168.119.201'
+if __name__ == '__main__':
+    app.run(host=Ip,port=8080,debug=True) 
