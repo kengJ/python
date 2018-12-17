@@ -15,33 +15,44 @@ _mssql.__version__
 # 处理pyinstaller 和 pymssql 闪退问题
 
 ##############################################公共工具函数#####################################################################
-# 链接数据库
-def conndb(host,username,password,database):
-	conn = pymssql.connect(host=host,user=username,password=password,database=database,charset='utf8')
-	cur = conn.cursor()
-	return (conn,cur)
-# 关闭数据库链接
-def connClose(conn):
-	conn.close()
+############################################## 数据库类 start ##############################################
+class db:
+	def __init__(self,host,username,password,database):
+		self.host = host
+		self.username = username
+		self.password = password
+		self.database = database
+		(self.conn,self.cur) = self.conndb()
 	
-# 数据库查询操作
-def select(cur,sql):
-	cur.execute(sql)
-	data = cur.fetchall()
-	if len(data)>0:
-		return data
-	else:
-		return None
+	# 链接数据库
+	def conndb(self):
+		conn = pymssql.connect(host=self.host,user=self.username,password=self.password,database=self.database,charset='utf8')
+		cur = conn.cursor()
+		return (conn,cur)
 
-# 数据库增删改操作
-def commit(sql):
-	cur.execute(sql)
-	conn.commit()
+	# 关闭数据库链接
+	def connClose(self):
+		self.conn.close()
 
-#批量插入
-def insert(cur,sql,data):
-	cur.executemany(sql,data)
-	conn.commit()
+	# 数据库查询操作
+	def select(self,sql):
+		self.cur.execute(sql)
+		data = self.cur.fetchall()
+		if len(data)>0:
+			return data
+		else:
+			return None
+	
+	# 数据库增删改操作
+	def commit(self,sql):
+		self.cur.execute(sql)
+		self.conn.commit()
+
+	#批量插入
+	def insert(self,sql,data):
+		self.cur.executemany(sql,data)
+		self.conn.commit()
+############################################## 数据库类 end ##############################################
 
 # 格式化 输出
 def formatTable(data,title,setting={}):

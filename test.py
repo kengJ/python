@@ -1,4 +1,4 @@
-import tool.base as basic
+import tool.basic as basic
 
 
 host='192.168.119.203'
@@ -6,7 +6,10 @@ username='sa'
 password='donlim.com'
 database='zkteco_database'
 
-(conn,cur) = basic.conndb(host,username,password,database)
+mssql = basic.db(host,username,password,database)
+# mssql
+
+# (conn,cur) = basic.conndb(host,username,password,database)
 file =open('./input.txt','r').readlines()
 codes = []
 for code in file:
@@ -21,14 +24,14 @@ sql = """
 	and not exists(select RIGHT(code,6) from emp_sync c where  a.code=RIGHT(c.pin,6) and c.sync_flag=0 and c.deal_flag=0)     
 	and not exists(select RIGHT(code,6) from userinfo d where  a.code=RIGHT(d.badgenumber,6))
 	""" % subsql
-data = basic.select(cur,sql)
+data = mssql.select(sql)
 if data == 	None:
 	print("人员已同步")
 else:
 	basic.formatTable(data,['工号','姓名','部门编码','区域','指纹数','同步时间','待下载标记'])
 	check = input('是否进行插入:')
 	if check == 'y':
-		basic.insert(cur,'insert into emp_sync (pin,name,deptcode,areacode,sync_flag,sync_time,deal_flag) ',data)
+		mssql.insert(cur,'insert into emp_sync (pin,name,deptcode,areacode,sync_flag,sync_time,deal_flag) ',data)
 
-basic.connClose(conn)
+# basic.connClose(conn)
 input('输入任意键结束')
