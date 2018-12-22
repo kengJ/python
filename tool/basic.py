@@ -1,7 +1,8 @@
 import pymssql
 from prettytable import PrettyTable
 import os
-import xlwt # excel 写入
+import xlwt,xlrd # excel 写入
+import openpyxl # excel 2007
 
 # 处理pyinstaller 和 pymssql 闪退问题
 import uuid
@@ -87,27 +88,89 @@ def listDri(url,setting={}):
 			print('%d.%s' % (index+1,files[index]))
 	return files
 
-# excel 写入
-def excelWrite(data,uri,title=[]):
-	# 判断是否有标题存在
-	# 判断是否有数据
-	if len(data)>0:
-		book = xlwt.Workbook(encoding='utf-8', style_compression=0)
-		for key in sorted(data):
-			row = 0
-			col = 0
-			sheet = book.add_sheet(key, cell_overwrite_ok=True)
-			if len(title) > 0:
-				for value in title:
-					sheet .write(row,col,value)
-					col += 1
-				row += 1
-			for line in data[key]:
+# excel 操作类	
+class excel:
+	def __init__(self,fileUri):
+		if os.path.exists(fileUri):
+			self.uri = fileUri
+		else:
+			raise RuntimeError('无法找到该文件: %s' % fileUri)
+	# excel 写入
+	def excelWrite(self,data,title=[]):
+		# 判断是否有标题存在
+		# 判断是否有数据
+		if len(data)>0:
+			book = xlwt.Workbook(encoding='utf-8', style_compression=0)
+			for key in sorted(data):
+				row = 0
 				col = 0
-				for value in line:
-					sheet .write(row,col,value)
-					col += 1
-				row += 1
-		book.save(uri)	
-				
+				sheet = book.add_sheet(key, cell_overwrite_ok=True)
+				if len(title) > 0:
+					for value in title:
+						sheet .write(row,col,value)
+						col += 1
+					row += 1
+				for line in data[key]:
+					col = 0
+					for value in line:
+						sheet .write(row,col,value)
+						col += 1
+					row += 1
+			book.save(self.uri)	
+	
+class excel2007:
+	def __init__(self,fileUri):
+		if not os.path.exists(fileUri):
+			self.uri = fileUri
+			self.file = openpyxl.Workbook()
+			self.sheetno = 0
+			self.sheets = []
+		else:
+			raise RuntimeError('文件已存在: %s' % fileUri)
+	
+	def addSheet(self,sheetName):
+		# 判断工作表名称是否已存在
+		if sheetName in self.sheets:
+			raise RuntimeError('工作表名称已存在: %s' % sheetName)
+		self.sheet = self.file.create_sheet(sheetName,self.sheetno)
+		self.sheets.append(sheetName)
+		self.sheetno += 1
+	
+	def writeData(self,data):
+		for line in data:
+			self.sheet.append(line)
+	def save(self):	
+		self.file.save(self.uri)
+
+# excel 阅读类
+# 只负责读取工作
+'''
+class excelread:
+	def __init__(self,uri):
+		if os.path.exists(self.uri):
+			self.file = xlrd.open_workbook(self.uri)
+		else:
+			raise RuntimeError('无法找到该文件: %s' % fileUri)
+	
+	# 返回所有工作表的名称
+	def getAllSheets(self):
+		return self.file.sheet_names()
+	
+	# 根据表格名称或编号获取表格，优先根据名称，
+	# 当名称为空时再使用编号进行获取，编号默认是第一个表格的编号
+	def setTable(self,tableName='',tableNo=0):
+		if not tableName == '':
+			table = self.file.sheet_by_name(tableName)
+		else:
+			table = sheet_by_index(tableNo)
+		self.table = table
+	def getMaxRow(self):
+		return self.table.nrows
+	def getData(self):
+		data = []
+		for i in range(0,getMaxRow()):
+			line = table.row_values(i)
+			data.append(line)
+		return data
+'''
 ##################################################################################################################################		
