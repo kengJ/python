@@ -61,14 +61,54 @@ class excelReader:
 	def close(self):
 		self.file.close()
 
-class excelReader2007:
-	def __init__(self,uri):
-		if os.path.exists(self.uri):
-			self.file = openpyxl.Workbook()
+class excelWriter:
+	def __init__(self,fileUri):
+		if not os.path.exists(fileUri):
+			self.uri = fileUri
+			self.file = xlwt.Workbook(encoding = 'utf-8')
+			self.sheetno = 0
+			self.sheets = []
 		else:
-			raise RuntimeError('无法找到该文件: %s' % fileUri)
-			
-	def close(self):
+			raise RuntimeError('文件已存在: %s' % fileUri)
+	
+	def addSheet(self,sheetName):
+		# 判断工作表名称是否已存在
+		if sheetName in self.sheets:
+			raise RuntimeError('工作表名称已存在: %s' % sheetName)
+		self.sheet = self.file.add_sheet(sheetName)
+		self.sheets.append(sheetName)
+		self.sheetno += 1
+	def writeData(self,data):
+		rowSize = len(data)-1
+		for line in range(0,rowSize):
+			colSize = len(line)-1
+			for i in range(0,size):
+				self.sheet.write(rowSize,colSize,data[rowSize][colSize])
+	def save(self):	
+		self.file.save(self.uri)	
+	
+class excelWriter2007:
+	def __init__(self,fileUri):
+		if not os.path.exists(fileUri):
+			self.uri = fileUri
+			self.file = openpyxl.Workbook()
+			self.sheetno = 0
+			self.sheets = []
+		else:
+			raise RuntimeError('文件已存在: %s' % fileUri)
+	
+	def addSheet(self,sheetName):
+		# 判断工作表名称是否已存在
+		if sheetName in self.sheets:
+			raise RuntimeError('工作表名称已存在: %s' % sheetName)
+		self.sheet = self.file.create_sheet(sheetName,self.sheetno)
+		self.sheets.append(sheetName)
+		self.sheetno += 1
+	
+	def writeData(self,data):
+		for line in data:
+			self.sheet.append(line)
+	def save(self):	
 		self.file.save(self.uri)	
 			
 			
