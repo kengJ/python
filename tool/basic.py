@@ -4,19 +4,39 @@ import os
 import xlwt,xlrd # excel 写入
 import openpyxl # excel 2007
 
-# 处理pyinstaller 和 pymssql 闪退问题
-import uuid
-import _mssql
-import decimal
-import pypyodbc
-decimal.__version__
-uuid.ctypes.__version__
-_mssql.__version__
+# 格式化 输出
+def formatTable(data,title,setting={}):
+	x = PrettyTable(title)
+	x.padding_width = 1
+	if len(setting)>0:
+		for key in sorted(setting):	
+			if setting[key] == 'left':
+				x.align[key] = 'l'
+	if len(title) == len(data[0]):
+		for line in data:
+			x.add_row(line)
+	else:
+		for line in data:
+			lineData = []
+			for index in range(0,int(len(title))-1):
+				lineData.append(line[index])
+			x.add_row(lineData)
+	print(x)
+	
+# 递归
+def callbackFunc(message,func):
+	check = input(message)
+	if check == 'y':
+		func()
 
-# 处理pyinstaller 和 pymssql 闪退问题
+
+
+
+
 
 ##############################################公共工具函数#####################################################################
 ############################################## 数据库类 start ##############################################
+"""
 class db:
 	def __init__(self,host,username,password,database):
 		self.host = host
@@ -54,39 +74,9 @@ class db:
 		self.cur.executemany(sql,data)
 		self.conn.commit()
 ############################################## 数据库类 end ##############################################
+"""
 
-# 格式化 输出
-def formatTable(data,title,setting={}):
-	x = PrettyTable(title)
-	x.padding_width = 1
-	if len(setting)>0:
-		for key in sorted(setting):	
-			if setting[key] == 'left':
-				x.align[key] = 'l'
-	if len(title) == len(data[0]):
-		for line in data:
-			x.add_row(line)
-	else:
-		for line in data:
-			lineData = []
-			for index in range(0,int(len(title))-1):
-				lineData.append(line[index])
-			x.add_row(lineData)
-	print(x)
 
-# 递归
-def callbackFunc(message,func):
-	check = input(message)
-	if check == 'y':
-		func()
-
-# 遍历文件目录
-def listDri(url,setting={}):
-	files = os.listdir(url)
-	if not ('print' in setting and setting['print'] == 'off'):
-		for index in range(0,len(files)):
-			print('%d.%s' % (index+1,files[index]))
-	return files
 
 # excel 操作类	
 class excel:
