@@ -1,4 +1,5 @@
 import tool.basic as basic
+from tool import dbHelper as dbHelper
 import time,datetime
 
 def getdata(start,end):
@@ -6,8 +7,8 @@ def getdata(start,end):
 	username='tx_app'
 	password='app#%(app23'
 	database='txcard'
-
-	mssql = basic.db(host,username,password,database)
+	mssql = dbHelper(host=host,username=username,password=password,database=database,type='mssql')
+	#mssql = basic.db(host,username,password,database)
 
 	sql = """
 	select* from(  
@@ -44,29 +45,7 @@ def getdata(start,end):
 		pydate = line[10].strftime("%Y-%m-%d")
 		outputData.append([clock,code,cardno,name,checktime,deptid,dept,zhiji,zhiwu,pydate])
 	return outputData
-#print(outputData[0])
-'''
-# mssql
-file = open('input.txt').readlines()
-# (conn,cur) = basic.conndb(host,username,password,database)
-codes = []
-for code in file:
-	codes.append(code.replace('\n',''))
 
-subsql = "','".join(codes)
-sql = """
-	select rtrim(code),rtrim(name),ZhiWu,yuzhiwu from ZlEmployee where code in ('%s') and (zhiwu = '' or zhiwu is null)
-	""" % subsql
-# print(sql)
-data = mssql.select(sql)
-basic.formatTable(data,['工号','姓名','职务','职务2'])
-codes_text = []
-for line in data:
-	codes_text.append(line[0])
-print("('"+"','".join(codes_text)+"')")
-input('输入任意键结束')
-	
-'''
 try:
 	# data = [[1,2,3],[4,5,6]]
 	excel = basic.excel2007('./test123.xlsx')

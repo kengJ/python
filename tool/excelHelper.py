@@ -1,6 +1,6 @@
 import xlwt,xlrd # excel 写入
 import openpyxl # excel 2007
-#import XlsxWriter # excel 2007解决方案
+import xlsxwriter # excel 2007解决方案性能优于openpyxl，功能只限于写入
 
 
 class excelHelper:
@@ -118,4 +118,15 @@ class excelWriter:
 			self.__writeData2007(data)
 	def save(self):	
 		self.file.save(self.uri)	
+
+# 使用excelWriter实现		
+class excel2007:
+	def __init__(self,fileUri):
+		if not os.path.exists(fileUri):
+			self.uri = fileUri
+			self.file = xlsxwriter.Workbook(fileUri)
+			self.sheetno = 0
+			self.sheets = []
+		else:
+			raise RuntimeError('文件已存在: %s' % fileUri)
 	
