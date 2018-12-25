@@ -3,6 +3,7 @@ import pymssql as ms # mssql
 import pymysql as my # mysql
 
 # 处理pyinstaller 和 pymssql 闪退问题
+
 import uuid
 import _mssql
 import decimal
@@ -50,13 +51,17 @@ class db:
 			sql = sql.replace('%s','?')
 		try:
 			self.cur.executemany(sql,data)
+			self.conn.commit()
 			return True
 		except Exception as e:
+			self.conn.rollback()
 			print(e)
 			return False
 	def close():
 		self.cur.close()
 		self.conn.close()
+	def getcur(self):
+		return self.cur
 """	
 class sqlite:
 	def __init__(self,file):

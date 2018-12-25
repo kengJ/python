@@ -1,12 +1,21 @@
 import xlwt,xlrd # excel 写入
 import openpyxl # excel 2007
-import XlsxWriter # excel 2007解决方案
+#import XlsxWriter # excel 2007解决方案
 
-class excel:
-	def __init__(self,uri,):
+
+class excelHelper:
+	# 三种模式 r w m (读取,写入,修改)
+	def __init__(self,uri,type):
 		self.uri = uri
 		self.__checkFile()
-		self.type = None
+		self.type = type
+		if type=='r':
+			return excelReader(uri)
+		elif type == 'w':
+			return excelWriter(uri,self.fileType)
+		elif type == 'm':
+			self.workbook = map()
+			self.file = excelReader(uri)
 	# 检查文件
 	def __checkFile(self):
 		#检查文件类型
@@ -15,19 +24,28 @@ class excel:
 		elif '.xls' in self.uri:
 			self.fileType = 'excel2003'
 		else:
-			self.fileType = 'other'
+			raise RuntimeError("无法识别文件类型:%s" % (self.uri))
 		#检查文件是否存在
 		self.fileActive = os.path.exists(self.uri)
-	# 设置模式
-	def __setModel(self,type):
-		self.type = type
-	# 判断是否阅读模式
-	def __checkReadFile(self):
-		if self.type is None or self.type=='read':
-			self.__setModel('read')
-		else:
-			raise RuntimeError("对象正在进行写入操作,无法读取")
-
+	def copySheet(self,sheetName,newSheetName=''):
+		self.file.setTable(sheetName)
+		sheetData = self.file.getData()
+		if newSheetName == '':
+			newSheetName = sheetName
+		self.workbook[newSheetName] = sheetData
+	def copyWorkbook(self):
+		sheets = self.file.getAllSheets()
+		for sheetname in sheets:
+			self.copySheet(sheetname)
+	def save(self,uri):
+		excel = excelWriter(uri,self.fileType)
+		for sheetname in self.workbook.keys():
+			excel.addSheet(sheetname)
+			excel.writeData(self.workbook[sheetname])
+		excel.save(uri)
+		self.file.close()
+		excel.close()
+		
 # excel 读取使用xlrd完成
 # excel 阅读类
 # 只负责读取工作
@@ -62,10 +80,13 @@ class excelReader:
 		self.file.close()
 
 class excelWriter:
-	def __init__(self,fileUri):
+	def __init__(self,fileUri,type):
 		if not os.path.exists(fileUri):
 			self.uri = fileUri
-			self.file = xlwt.Workbook(encoding = 'utf-8')
+			if type == 'excel2003':
+				self.file = xlwt.Workbook(encoding = 'utf-8')
+			elif type == 'excel2007':
+				self.file = openpyxl.Workbook()
 			self.sheetno = 0
 			self.sheets = []
 		else:
@@ -75,42 +96,26 @@ class excelWriter:
 		# 判断工作表名称是否已存在
 		if sheetName in self.sheets:
 			raise RuntimeError('工作表名称已存在: %s' % sheetName)
-		self.sheet = self.file.add_sheet(sheetName)
+		if type == 'excel2003':
+			self.sheet = self.file.add_sheet(sheetName)
+		elif type == 'excel2007':
+			self.sheet = self.file.create_sheet(sheetName,self.sheetno)
 		self.sheets.append(sheetName)
 		self.sheetno += 1
-	def writeData(self,data):
+	def __writeData2003(self,data):
 		rowSize = len(data)-1
 		for line in range(0,rowSize):
 			colSize = len(line)-1
 			for i in range(0,size):
 				self.sheet.write(rowSize,colSize,data[rowSize][colSize])
-	def save(self):	
-		self.file.save(self.uri)	
-	
-class excelWriter2007:
-	def __init__(self,fileUri):
-		if not os.path.exists(fileUri):
-			self.uri = fileUri
-			self.file = openpyxl.Workbook()
-			self.sheetno = 0
-			self.sheets = []
-		else:
-			raise RuntimeError('文件已存在: %s' % fileUri)
-	
-	def addSheet(self,sheetName):
-		# 判断工作表名称是否已存在
-		if sheetName in self.sheets:
-			raise RuntimeError('工作表名称已存在: %s' % sheetName)
-		self.sheet = self.file.create_sheet(sheetName,self.sheetno)
-		self.sheets.append(sheetName)
-		self.sheetno += 1
-	
-	def writeData(self,data):
+	def __writeData2007(self,data):
 		for line in data:
 			self.sheet.append(line)
+	def writeData(self,data):
+		if type == 'excel2003':
+			self.__writeData2003(data)
+		elif type == 'excel2007':
+			self.__writeData2007(data)
 	def save(self):	
 		self.file.save(self.uri)	
-			
-			
-			
-			
+	
