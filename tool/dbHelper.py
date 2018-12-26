@@ -40,7 +40,13 @@ class db:
 	def select(self,sql):
 		try:
 			self.cur.execute(sql)
-			data = self.cur.fetchall()
+			titles = [name[0] for name in self.cur.description]
+			data = [titles]
+			for line in self.cur.fetchall():
+				lineData = []
+				for value in line:
+					lineData.append(value)
+				data.append(lineData)
 			return data
 		except Exception as e:
 			print(e)
@@ -60,36 +66,3 @@ class db:
 	def close():
 		self.cur.close()
 		self.conn.close()
-	def getcur(self):
-		return self.cur
-"""	
-class sqlite:
-	def __init__(self,file):
-		self.file = file
-		self.__connect()
-	def __connect(self):
-		self.conn = sq.connect(self.file)
-		self.cur = self.conn.cursor()
-		
-class mssql:
-	def __init__(self,host,username,password,database):
-		self.host = host
-		self.username = username
-		self.password = password
-		self.database = database
-		self.__connect()
-	def __connect(self):
-		self.conn = ms.connect(host=self.host,user=self.username,password=self.password,database=self.database,charset='utf8')
-		self.cur = self.conn.cursor()
-
-class mysql:
-	def __init__(self,host,username,password,database):
-		self.host = host
-		self.username = username
-		self.password = password
-		self.database = database
-		self.__connect()
-	def __connect(self):
-		self.conn = my.connect(host=self.host,user=self.username,password=self.password,database=self.database,charset='utf8')
-		self.cur = self.conn.cursor()
-"""		

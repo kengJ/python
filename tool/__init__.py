@@ -4,6 +4,7 @@ import tool.osHelper as osHelper
 import tool.pictureHelper as pictureHelper
 import tool.backupHelper as backupHelper
 from tool.excelHelper import excelHelper as excelHelper
+import tool.dataHelper as dataHelper
 
 
 __all__ = [
@@ -12,6 +13,7 @@ __all__ = [
 			'pictureHelper',
 			'backupHelper',
 			'excelHelper',
+			'dataHelper',
 			'basic',
 			'formatTable',
 			'callbackFunc'
