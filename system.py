@@ -2,6 +2,8 @@ from tool import dbHelper as dbHelper
 from tool import dataHelper as dataHelper
 from getpass import getpass as getpass
 
+
+
 def test():
 	db = dbHelper(type='sqlite',file='./db/system.db')
 	# 获取表名
@@ -40,11 +42,42 @@ def checkUser(username,password):
 		print('LOGIN SUCCESS')
 	else:
 		print('LOGIN FLAST')
+	db.close()
+
+def adduser(u,p):
+	db = dbHelper(type='sqlite',file='./db/system.db')
+	db.sql("INSERT INTO USER (USERCODE,USERNAME,PASSWORD) VALUES ('%s','%s','%s')" % (u,u,p))
+	db.close()
+	print('添加用户:%s [成功]' % u)
+	
 def main():
+	isclose = False
 	username = input('输入账号名:')
 	password = getpass('请输入密码:')
 	#print(password)
 	checkUser(username,password)
+	
+	while not isclose:
+		command = input('>')
+		if command.find('-')==-1:
+			commandCode = command.replace(' ','')
+			args = []
+		else:
+			commandCode = command[0:command.find(' ')]
+			args = command[command.find(' '):] 
+			args = args[args.find('-')+1:].split('-')
+		argsmap = {}
+		argsText = []
+		
+		for value in args:
+			argsmap[value.split(' ')[0]] = value.split(' ')[1]
+			argsText.append(value.split(' ')[0]+'='+"'"+value.split(' ')[1]+"'")
+		if commandCode == 'close':
+			exit(0)
+		if len(argsText)==0:
+			exec('%s()' % (commandCode))
+		else:
+			exec('%s(%s)' % (commandCode,",".join(argsText)))
 if __name__ == '__main__':
 	main()
 

@@ -63,6 +63,6 @@ class db:
 			self.conn.rollback()
 			print(e)
 			return False
-	def close():
+	def close(self):
 		self.cur.close()
 		self.conn.close()
