@@ -1,7 +1,7 @@
 import xlwt,xlrd # excel 写入
 import openpyxl # excel 2007
 import xlsxwriter # excel 2007解决方案性能优于openpyxl，功能只限于写入
-
+import os
 
 class excelHelper:
 	# 三种模式 r w m (读取,写入,修改)
@@ -10,7 +10,8 @@ class excelHelper:
 		self.__checkFile()
 		self.type = type
 		if type=='r':
-			return excelReader(uri)
+			self.file = excelReader(uri)
+			#return excelReader(uri)
 		elif type == 'w':
 			return excelWriter(uri,self.fileType)
 		elif type == 'm':
@@ -51,8 +52,8 @@ class excelHelper:
 # 只负责读取工作
 class excelReader:
 	def __init__(self,uri):
-		if os.path.exists(self.uri):
-			self.file = xlrd.open_workbook(self.uri)
+		if os.path.exists(uri):
+			self.file = xlrd.open_workbook(uri)
 		else:
 			raise RuntimeError('无法找到该文件: %s' % fileUri)
 	
@@ -66,14 +67,14 @@ class excelReader:
 		if not tableName == '':
 			table = self.file.sheet_by_name(tableName)
 		else:
-			table = sheet_by_index(tableNo)
+			table = self.file.sheet_by_index(tableNo)
 		self.table = table
 	def getMaxRow(self):
 		return self.table.nrows
 	def getData(self):
 		data = []
-		for i in range(0,getMaxRow()):
-			line = table.row_values(i)
+		for i in range(0,self.getMaxRow()):
+			line = self.table.row_values(i)
 			data.append(line)
 		return data
 	def close(self):

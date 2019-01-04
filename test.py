@@ -11,7 +11,7 @@ def getdata(start,end):
 	#mssql = basic.db(host,username,password,database)
 
 	sql = """
-	select* from(  
+	select id,workno,workid,name,data_datetime,dept,longname,zhiji,zwname,入职日期 ,tt from(  
 		SELECT *,ROW_NUMBER() OVER(partition by WORKNO,Convert(char(11),DATA_DATETIME,120) ORDER BY Convert(char(11),DATA_DATETIME,120))tt  
 		FROM (  SELECT AT.ID,DE.DEVNAME,WORKNO,WORKID,ZE.NAME,AT.Data_datetime,  ZE.Dept,ZD.LongName,ZE.ZHIJI,ZW.NAME AS ZWNAME,ze.PyDate as 入职日期  
 			FROM Attend_Data AT  LEFT JOIN ZlEmployee ze (NOLOCK) ON AT.WorkNo=ZE.CODE   
@@ -26,34 +26,31 @@ def getdata(start,end):
 
 	data = mssql.select(sql)
 	outputData = []
-	for line in data:
+	for line in data[1:]:
 		clock = line[0].rstrip()
-		code = line[2].rstrip()
-		if line[3]==None:
+		code = line[1].rstrip()
+		if line[2]==None:
 			cardno = ''
 		else:
-			cardno = line[3].rstrip()
-		name = line[4].rstrip()
-		checktime = line[5].strftime("%Y-%m-%d %H:%M:%S")
-		deptid = line[6]
-		dept = line[7]
-		zhiji = line[8].rstrip()
-		if line[9]==None:
+			cardno = line[2].rstrip()
+		name = line[3].rstrip()
+		checktime = line[4].strftime("%Y-%m-%d %H:%M:%S")
+		deptid = line[5]
+		dept = line[6]
+		zhiji = line[7].rstrip()
+		if line[8]==None:
 			zhiwu = ''
 		else:
-			zhiwu = line[9].rstrip()
-		pydate = line[10].strftime("%Y-%m-%d")
+			zhiwu = line[8].rstrip()
+		pydate = line[9].strftime("%Y-%m-%d")
 		outputData.append([clock,code,cardno,name,checktime,deptid,dept,zhiji,zhiwu,pydate])
 	return outputData
 
 try:
 	# data = [[1,2,3],[4,5,6]]
 	excel = basic.excel2007('./test123.xlsx')
-	excel.addSheet('11')
-	outputData = getdata('2018-11-01','2018-11-30 23:59:59')
-	excel.writeData(outputData)
 	excel.addSheet('12')
-	outputData = getdata('2018-12-01','2018-12-31 23:59:59')
+	outputData = getdata('2018-12-21','2018-12-31 23:59:59')
 	excel.writeData(outputData)
 	excel.save()
 except Exception as e:
