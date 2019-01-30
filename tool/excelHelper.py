@@ -1,6 +1,6 @@
 import xlwt,xlrd # excel 写入
 import openpyxl # excel 2007
-import xlsxwriter # excel 2007解决方案性能优于openpyxl，功能只限于写入
+#import xlsxwriter # excel 2007解决方案性能优于openpyxl，功能只限于写入
 import os
 
 class excelHelper:
@@ -13,7 +13,8 @@ class excelHelper:
 			self.file = excelReader(uri)
 			#return excelReader(uri)
 		elif type == 'w':
-			return excelWriter(uri,self.fileType)
+			self.file = excelWriter(uri,self.fileType)
+			#return excelWriter(uri,self.fileType)
 		elif type == 'm':
 			self.workbook = map()
 			self.file = excelReader(uri)
@@ -88,6 +89,7 @@ class excelWriter:
 				self.file = xlwt.Workbook(encoding = 'utf-8')
 			elif type == 'excel2007':
 				self.file = openpyxl.Workbook()
+				#self.file = self.file.active
 			self.sheetno = 0
 			self.sheets = []
 		else:
@@ -100,7 +102,8 @@ class excelWriter:
 		if type == 'excel2003':
 			self.sheet = self.file.add_sheet(sheetName)
 		elif type == 'excel2007':
-			self.sheet = self.file.create_sheet(sheetName,self.sheetno)
+			self.sheet = self.file.create_sheet(sheetName)
+			#self.sheet.title = sheetName
 		self.sheets.append(sheetName)
 		self.sheetno += 1
 	def __writeData2003(self,data):
